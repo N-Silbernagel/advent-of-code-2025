@@ -48,14 +48,60 @@ fn part1(input: []const u8) u16 {
     return zeros;
 }
 
+fn part2(input: []const u8) u16 {
+    var zeros: u16 = 0;
+    var position: u8 = 50;
+
+    var lines = std.mem.tokenizeAny(u8, input, "\r\n");
+
+    while (lines.next()) |line| {
+        const direction = line[0];
+        const number_str = line[1..];
+        const number = std.fmt.parseInt(u16, number_str, 10) catch std.debug.panic("Could not parse int {s}", .{number_str});
+
+        for (0..number) |_| {
+            switch (direction) {
+                'L' => {
+                    if (position == 0) {
+                        position = 99; // Wrap around to the right edge
+                    } else {
+                        position -= 1;
+                    }
+                },
+                'R' => {
+                    position += 1;
+                    if (position == 100) {
+                        position = 0; // Wrap around to the left edge
+                    }
+                },
+                else => std.debug.panic("Unexpected direction: '{c}' (value: {d})", .{ direction, direction }),
+            }
+
+            if (position == 0) {
+                zeros += 1;
+            }
+        }
+    }
+
+    return zeros;
+}
+
 pub fn main() !void {
     std.debug.print("{}", .{part1(real)});
 }
 
-test "correct part 1 example output" {
+test "correct part 1 example input" {
     try std.testing.expectEqual(3, part1(example));
 }
 
-test "correct part 1 real output" {
+test "correct part 1 real input" {
     try std.testing.expectEqual(1135, part1(real));
+}
+
+test "correct part 2 example input" {
+    try std.testing.expectEqual(6, part2(example));
+}
+
+test "correct part 2 real input" {
+    try std.testing.expectEqual(6558, part2(real));
 }
