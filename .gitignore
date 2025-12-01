@@ -2,3 +2,4 @@
 zig-out/
 build_runner.zig
 .idea
+src/data
