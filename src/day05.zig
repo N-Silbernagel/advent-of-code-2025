@@ -145,5 +145,5 @@ test "correct part 2 example input" {
 }
 
 test "correct part 2 real input" {
-    try std.testing.expectEqual(8451, part2(real));
+    try std.testing.expectEqual(343329651880509, part2(real));
 }
