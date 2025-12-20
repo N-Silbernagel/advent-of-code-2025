@@ -12,14 +12,20 @@ const example = @embedFile("data/day06_example.txt");
 
 const real = @embedFile("data/day06.txt");
 
-fn part1(input: []const u8) u128 {
+fn part1(input: []const u8, alloc: Allocator) u128 {
     var lines = std.mem.tokenizeAny(u8, input, "\n");
 
     var grand_total: u128 = 0;
 
-    var spreadsheet = std.ArrayList(std.ArrayList(u16)).init(gpa);
+    var arena = std.heap.ArenaAllocator.init(alloc);
+    defer arena.deinit();
+
+    const arena_allocator = arena.allocator();
+
+    var spreadsheet = std.ArrayList(std.ArrayList(u16)).init(arena_allocator);
+
     while (lines.next()) |line| {
-        var row = std.ArrayList(u16).init(gpa);
+        var row = std.ArrayList(u16).init(arena_allocator);
 
         var cell_strings = std.mem.tokenizeAny(u8, line, " ");
 
@@ -32,12 +38,10 @@ fn part1(input: []const u8) u128 {
 
                 for (spreadsheet.items) |numbers_row| {
                     if (is_addition) {
-                        //std.debug.print("{d} + {d}\n", .{column_result, numbers_row.items[column_index]});
                         column_result += numbers_row.items[column_index];
                     }
 
                     if (is_multiplication) {
-                        //std.debug.print("{d} * {d}\n", .{column_result, numbers_row.items[column_index]});
                         column_result *= numbers_row.items[column_index];
                     }
                 }
@@ -126,11 +130,11 @@ pub fn main() !void {
 }
 
 test "correct part 1 example input" {
-    try std.testing.expectEqual(4277556, part1(example));
+    try std.testing.expectEqual(4277556, part1(example, std.testing.allocator));
 }
 
 test "correct part 1 real input" {
-    try std.testing.expectEqual(8108520669952, part1(real));
+    try std.testing.expectEqual(8108520669952, part1(real, std.testing.allocator));
 }
 
 test "correct part 2 example input" {
